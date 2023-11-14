@@ -1,7 +1,7 @@
 import unittest
 from selenium import webdriver
 
-
+# 02. unittest 모듈로 기능 테스트 확장
 # unittest.TestCase 사용
 # https://docs.python.org/3/library/unittest.html
 class NewVisitorTest(unittest.TestCase):
