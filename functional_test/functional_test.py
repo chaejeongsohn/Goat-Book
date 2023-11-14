@@ -43,13 +43,23 @@ class NewVisitorTest(unittest.TestCase):
 
         inputbox.send_keys("Buy peacock feathers")
         inputbox.send_keys(Keys.ENTER)
-        time.sleep(1)  # 명시적 대기(브라우저 로드완료)
+        time.sleep(1)  # 명시적 대기(브라우저 로드 용도)
 
         table = self.browser.find_element(By.ID, "id_list_table")
         rows = table.find_elements(By.TAG_NAME, "tr")
-        self.assertTrue(any(row.text == "1.Buy peacock feathers" for row in rows), "table에 새로운 to-do item이 없습니다.")
 
-        self.fail("테스트 완료!")
+        # self.assertTrue(any(row.text == "1.Buy peacock feathers" for row in rows),
+        #                 f"table에 새로운 to-do item이 없습니다. 입력받은 내용:\n{table.text}",)
+        # 같은 내용을 아래 self.assertIn 로 구현
+        self.assertIn(
+            "1: Buy peacock feathers",
+            [row.text for row in rows]
+        )
+        self.assertIn(
+            "2: Use peacock feathers to make a fly",
+            [row.text for row in rows],
+        )
+        
 
 
 

@@ -17,3 +17,8 @@ class HomePageTest(TestCase):
     def test_uses_home_template(self):
         response = self.client.get("/")
         self.assertTemplateUsed(response,"home.html")  # 어떤 템플릿이 사용되는지 확인
+
+    def test_can_save_a_POST_request(self):
+        response = self.client.post("/", data={"item_text":"A new list item"})  # POST 실행
+        self.assertContains(response, "A new list item")  
+        self.assertTemplateUsed(response, "home.html")  # 어떤 템플릿이 사용되는지 확인
