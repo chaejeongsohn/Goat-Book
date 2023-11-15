@@ -31,7 +31,6 @@ class NewVisitorTest(unittest.TestCase):
         header_text = self.browser.find_element(By.TAG_NAME, "h1").text
         self.assertIn("To-Do", header_text)
 
-
         inputbox = self.browser.find_element(By.ID, "id_new_item")
         self.assertEqual(inputbox.get_attribute("placeholder"),"Enter a to-do item")
         
@@ -50,6 +49,7 @@ class NewVisitorTest(unittest.TestCase):
         # 입력 테이블 확인
         self.check_for_row_in_list_table("1: Buy peacock feathers")
         self.check_for_row_in_list_table("2: Use peacock feathers to make a fly")
+
 
 
 
