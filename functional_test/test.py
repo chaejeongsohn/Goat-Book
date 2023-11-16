@@ -1,4 +1,4 @@
-from django.test import LiveServerTestCase
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 import unittest
 import time
 from selenium import webdriver
@@ -9,7 +9,8 @@ from selenium.webdriver.common.keys import Keys
 MAX_WAIT = 5
 
 
-class NewVisitorTest(LiveServerTestCase):
+## static 파일을 자동으로 찾기 위해 test class 변경
+class NewVisitorTest(StaticLiveServerTestCase):
     # 테스트 시작 전
     def setUp(self):
         self.browser = webdriver.Firefox()
