@@ -24,6 +24,17 @@ class FunctionalTest(StaticLiveServerTestCase):
     def tearDown(self):
         self.browser.quit()
 
+    # 페이지가 로드되고 함수가 작동될 때까지 시도한다
+    def wait_for(self, fn):
+        start_time = time.time()
+        while True:
+            try:
+                return fn()
+            except (AssertionError, WebDriverException) as e:
+                if time.time() - start_time > MAX_WAIT:  
+                    raise e
+                time.sleep(0.5)
+
     # 입력 행이 테이블에 로드 되도록 기다린다
     def wait_for_row_in_list_table(self, row_text):
         start_time = time.time()
@@ -37,6 +48,8 @@ class FunctionalTest(StaticLiveServerTestCase):
                 if time.time() - start_time > MAX_WAIT:  
                     raise  
                 time.sleep(0.5)
+
+
 
 
 if __name__ == "__main__":
