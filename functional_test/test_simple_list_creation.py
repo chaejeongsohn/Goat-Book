@@ -7,7 +7,7 @@ from selenium.webdriver.common.keys import Keys
 
 class NewVisitorTest(FunctionalTest):
 
-    def test_can_start_a_todo_list(self):
+    def test_can_start_a_list_for_one_user(self):
         # Lisa가 홈페이지 방문
         self.browser.get(self.live_server_url)
 
@@ -15,7 +15,7 @@ class NewVisitorTest(FunctionalTest):
         header_text = self.browser.find_element(By.TAG_NAME, "h1").text
         self.assertIn("To-Do", header_text)
 
-        inputbox = self.browser.find_element(By.ID, "id_new_item")
+        inputbox = self.get_item_input_box()
         self.assertEqual(inputbox.get_attribute("placeholder"),"Enter a to-do item")
         
         # Lisa가 첫번째 입력
@@ -24,7 +24,7 @@ class NewVisitorTest(FunctionalTest):
         self.wait_for_row_in_list_table("1: 공작 깃털 구매")
 
         # Lisa가 두번째 입력
-        inputbox = self.browser.find_element(By.ID, "id_new_item")
+        inputbox = self.get_item_input_box()
         inputbox.send_keys("공작 깃털로 부채 만들기")
         inputbox.send_keys(Keys.ENTER)   
 
@@ -35,7 +35,7 @@ class NewVisitorTest(FunctionalTest):
     def test_multiple_users_can_start_lists_at_different_urls(self):
         # 첫번째 유저 Lisa가 방문하고, 허나 입력함 
         self.browser.get(self.live_server_url)
-        inputbox = self.browser.find_element(By.ID, "id_new_item")
+        inputbox = self.get_item_input_box()
         inputbox.send_keys("공작 깃털 구매")
         inputbox.send_keys(Keys.ENTER)
         self.wait_for_row_in_list_table("1: 공작 깃털 구매")
@@ -55,7 +55,7 @@ class NewVisitorTest(FunctionalTest):
         self.assertNotIn("부채 만들기", page_text)
 
         # Francis가 첫번째 입력
-        inputbox = self.browser.find_element(By.ID, "id_new_item")
+        inputbox = self.get_item_input_box()
         inputbox.send_keys("우유 구매")
         inputbox.send_keys(Keys.ENTER) 
         self.wait_for_row_in_list_table("1: 우유 구매")

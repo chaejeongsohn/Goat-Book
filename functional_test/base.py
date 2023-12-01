@@ -49,7 +49,9 @@ class FunctionalTest(StaticLiveServerTestCase):
                     raise  
                 time.sleep(0.5)
 
-
+    # id가 id_text인 요소 찾기
+    def get_item_input_box(self):
+        return self.browser.find_element(By.ID, 'id_text')
 
 
 if __name__ == "__main__":

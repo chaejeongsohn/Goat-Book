@@ -19,7 +19,7 @@ class ItemForm(forms.ModelForm):
         }
 
     def clean_text(self):
-        item_text = self.cleaned_data['item_text']
-        if not item_text:
+        text = self.cleaned_data['text']
+        if not text:
             raise forms.ValidationError("공백은 입력할 수 없습니다.")
-        return item_text
+        return text
