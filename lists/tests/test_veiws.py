@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.utils.html import escape
 from django.http import HttpRequest
 from lists.views import home_page
 from lists.models import Item, List
@@ -28,6 +29,28 @@ class NewListTest(TestCase):
         response = self.client.post("/lists/new", data={"item_text":"A new list item"})
         new_list = List.objects.get()
         self.assertRedirects(response, f"/lists/{new_list.id}/")  # POST 요청이후에 반환되는 뷰 확인
+
+    def test_validation_errors_are_sent_back_to_home_page_template(self):
+        response= self.client.post('/lists/new', data={'item_text': ''})
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'list.html')
+        expected_error = escape("공백은 입력할 수 없습니다.")
+        self.assertContains(response, expected_error)
+
+    def test_invalid_list_items_arent_saved(self):
+        self.client.post('/lists/new', data={'item_text': ''})
+        self.assertEqual(Item.objects.count(), 0)
+
+    def test_validation_errors_end_up_on_lists_page(self):
+        list_ = List.objects.create()
+        response = self.client.post(
+            f'/lists/{list_.id}/',
+            data={'item_text':''}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'list.html')
+        expected_error = escape("공백은 입력할 수 없습니다.")
+        self.assertContains(response, expected_error)
 
 
 ## List View 페이지: 기존 항목 표시, 목록에 새 항목 추가
@@ -60,11 +83,11 @@ class ListViewTest(TestCase):
         other_list = List.objects.create()
         correct_list = List.objects.create()
 
-        self.client.post(f"/lists/{correct_list.id}/add_item", 
+        self.client.post(f"/lists/{correct_list.id}/", 
                          data={"item_text":"이미 존재하는 list에 새로운 Item 추가"})
 
         self.assertEqual(Item.objects.count(), 1)
-        new_item = Item.objects.get()
+        new_item = Item.objects.first()
         self.assertEqual(new_item.text, "이미 존재하는 list에 새로운 Item 추가")
         self.assertEqual(new_item.list, correct_list)
 
@@ -72,6 +95,6 @@ class ListViewTest(TestCase):
         other_list = List.objects.create()
         correct_list = List.objects.create()
 
-        response = self.client.post(f"/lists/{correct_list.id}/add_item",
+        response = self.client.post(f"/lists/{correct_list.id}/",
                                     data={"item_text":"이미 존재하는 list에 새로운 Item 추가"})
         self.assertRedirects(response, f"/lists/{correct_list.id}/")
