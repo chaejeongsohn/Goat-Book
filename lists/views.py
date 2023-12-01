@@ -21,7 +21,7 @@ def new_list(request):
         return render(request, "list.html", {'list': newList, 'error_msg': error_msg})
 
     Item.objects.create(text = item_text, list=newList)
-    return redirect(f"/lists/{newList.id}/")
+    return redirect(newList)
 
 
 def view_list(request, list_id):
@@ -32,7 +32,7 @@ def view_list(request, list_id):
             item = Item(text=request.POST['item_text'], list=our_list)
             item.full_clean()
             item.save()
-            return redirect(f"/lists/{our_list.id}/")
+            return redirect(our_list)
         except ValidationError:
             error_msg = "공백은 입력할 수 없습니다."
     return render(request, "list.html", {"list": our_list, 'error_msg': error_msg})
