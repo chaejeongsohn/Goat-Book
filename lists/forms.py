@@ -18,6 +18,10 @@ class ItemForm(forms.ModelForm):
             'text': {'required': EMPTY_ITEM_ERROR}
         }
 
+    def save(self, for_list):
+        self.instance.list = for_list
+        return super().save()
+
     def clean_text(self):
         text = self.cleaned_data['text']
         if not text:

@@ -9,10 +9,9 @@ from unittest import skip
 
 class ItemValidationTest(FunctionalTest):
 
-    # def get_error_element(self):
-    #     return self.browser.find_element_by_css_selector('.has-error')
+    def get_error_element(self):
+        return self.browser.find_element(By.CSS_SELECTOR, '.has-error')
 
-    # @skip
     def test_cannot_add_empty_list_items(self):
         # 빈 리스트, 빈 inbut을 submit함
         self.browser.get(self.live_server_url)
@@ -47,4 +46,20 @@ class ItemValidationTest(FunctionalTest):
         inputbox.send_keys(Keys.ENTER)
         self.wait_for_row_in_list_table('1: Buy milk')
         self.wait_for_row_in_list_table('2: Make tea')
+
+    def test_cannot_add_duplicate_items(self):
+        # 에디는 홈으로 가서 새 목록을 시작한다
+        self.browser.get(self.live_server_url)
+        self.get_item_input_box().send_keys('장화 사기')
+        self.get_item_input_box().send_keys(Keys.ENTER)
+        self.wait_for_row_in_list_table('1.장화 사기')
+
+        # 에디는 실수로 중복 아이템을 입력함
+        self.get_item_input_box().send_keys('장화 사기')
+        self.get_item_input_box().send_keys(Keys.ENTER)
+
+        self.wait_for(lambda: self.assertEqual(
+            self.browser.find_element(By.CSS_SELECTOR, '.has-error').text,
+            "동일한 항목이 이미 있습니다."
+        ))
 

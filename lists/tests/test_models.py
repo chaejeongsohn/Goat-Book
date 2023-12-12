@@ -4,34 +4,18 @@ from django.core.exceptions import ValidationError
 
 
 
-class ListAndItemModelsTest(TestCase):
+class ItemModelTest(TestCase):
 
-    def test_saving_and_retrieving_items(self):
-        mylist = List()
-        mylist.save()
+    def test_default_text(self):
+        item = Item()
+        self.assertEqual(item.text, '')
 
-        first_item = Item()
-        first_item.text = "첫번째 아이템"
-        first_item.list = mylist
-        first_item.save()
-
-        second_item = Item()
-        second_item.text = "두번째 아이템"
-        second_item.list = mylist
-        second_item.save()
-
-        saved_list = List.objects.get()
-        self.assertEqual(saved_list, mylist)
-
-        saved_items = Item.objects.all()  # Django 데이터베이스 쿼리
-        self.assertEqual(saved_items.count(), 2)
-
-        first_saved_item = saved_items[0]
-        second_saved_item = saved_items[1]
-        self.assertEqual(first_saved_item.text, "첫번째 아이템")
-        self.assertEqual(first_saved_item.list, mylist)
-        self.assertEqual(second_saved_item.text, "두번째 아이템")
-        self.assertEqual(second_saved_item.list, mylist)
+    def test_item_is_related_to_list(self):
+        list_ = List.objects.create()
+        item = Item()
+        item.list = list_
+        item.save()
+        self.assertIn(item, list_.item_set.all())
 
     def test_cannot_save_empty_list_items(self):
         list_ = List.objects.create()
@@ -39,6 +23,38 @@ class ListAndItemModelsTest(TestCase):
         with self.assertRaises(ValidationError):
             item.save()
             item.full_clean()
+
+    # 중복 항목이 오류 발생시키는지 확인
+    def test_duplicate_items_are_invalid(self):
+        list_ = List.objects.create()
+        Item.objects.create(list=list_, text='아무말')
+        with self.assertRaises(ValidationError):
+            item = Item(list=list_, text='아무말')
+            item.full_clean()
+            # item.save()
+
+    def test_CAN_save_same_item_to_different_lists(self):
+        list1 = List.objects.create()
+        list2 = List.objects.create()
+        Item.objects.create(list=list1, text='아무말')
+        item = Item(list=list2, text='아무말')
+        item.full_clean()  # 해당 코드 실행되서는 안됨
+
+    def test_list_ordering(self):
+        list1 = List.objects.create()
+        item1 = Item.objects.create(list=list1,text='아이템1')
+        item2 = Item.objects.create(list=list1,text='아이템2')
+        item3 = Item.objects.create(list=list1,text='아이템3')
+        self.assertEqual(
+            list(Item.objects.all()),
+            [item1, item2, item3]
+        )
+
+    def test_string_representation(self):
+        item = Item(text='어떤 텍스트')
+        self.assertEqual(str(item), '어떤 텍스트')
+        
+class ListModelTest(TestCase):
 
     def test_get_absolute_url(self):
         list_ = List.objects.create()
