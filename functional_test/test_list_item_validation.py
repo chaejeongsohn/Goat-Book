@@ -59,7 +59,27 @@ class ItemValidationTest(FunctionalTest):
         self.get_item_input_box().send_keys(Keys.ENTER)
 
         self.wait_for(lambda: self.assertEqual(
-            self.browser.find_element(By.CSS_SELECTOR, '.has-error').text,
+            self.get_error_element().text,
             "동일한 항목이 이미 있습니다."
         ))
 
+    def test_error_messages_are_cleared_on_input(self):
+        # 에디는 새 목록을 시작하고 validation error를 일으킨다
+        self.browser.get(self.live_server_url)
+        self.get_item_input_box().send_keys('농담하기')
+        self.get_item_input_box().send_keys(Keys.ENTER)
+        self.wait_for_row_in_list_table('1: 농담하기')
+        self.get_item_input_box().send_keys('농담하기')
+        self.get_item_input_box().send_keys(Keys.ENTER)
+
+        self.wait_for(lambda: self.assertTrue(
+            self.get_error_element().is_displayed()
+        ))
+
+        # 에디는 오류를 지우기 위해 input box에 입력한다
+        self.get_item_input_box().send_keys('a')
+
+        # 에디는 오류메세지가 사라진걸 보고 기뻐한다
+        self.wait_for(lambda: self.assertFalse(
+            self.get_error_element().is_displayed()
+        ))
