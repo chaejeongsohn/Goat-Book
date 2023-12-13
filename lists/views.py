@@ -1,6 +1,7 @@
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from lists.models import Item, List
+from lists.forms import ExistingListItemForm, ItemForm
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from .forms import ItemForm
@@ -37,10 +38,10 @@ def new_list(request):
 def view_list(request, list_id):
     our_list = List.objects.get(id=list_id)
     if request.method == 'POST':
-        form = ItemForm(data=request.POST)
+        form = ExistingListItemForm(for_list=our_list, data=request.POST)
         if form.is_valid():
-            form.save(for_list=our_list)
+            form.save()
             return redirect(our_list)
     else:
-        form = ItemForm()
+        form = ExistingListItemForm(for_list=our_list)
     return render(request, "list.html", {"list": our_list, "form": form})
